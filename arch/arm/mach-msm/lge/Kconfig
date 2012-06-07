@@ -1,0 +1,165 @@
+config MACH_LGE
+	bool
+
+menu "LGE Device-Specific Changes"
+
+menu "LGE Board Selection"
+
+config MACH_MSM7X25A_E0EU
+    depends on ARCH_MSM7X27A
+    depends on !MSM_STACKED_MEMORY
+    select MACH_LGE
+    bool "MSM7x25A E0EU"
+    help
+        Support for the LG Electronics MSM7x25A E0EUOPEN.
+config MACH_MSM7X25A_M3DVIV
+    depends on ARCH_MSM7X27A
+    depends on !MSM_STACKED_MEMORY
+    select MACH_LGE
+    bool "MSM7x25A M3DVIV"
+    help
+        Support for the LG Electronics MSM7x25A M3DVIV.
+        
+config MACH_MSM7X25A_M3DOPEN
+    depends on ARCH_MSM7X27A
+    depends on !MSM_STACKED_MEMORY
+    select MACH_LGE
+    bool "MSM7x25A M3DOPEN"
+    help
+        Support for the LG Electronics MSM7x25A M3EUOPEN.
+
+config MACH_MSM7X27A_M3EU
+    depends on ARCH_MSM7X27A
+    depends on !MSM_STACKED_MEMORY
+    select MACH_LGE
+    bool "MSM7x27A M3EU"
+    help
+        Support for the LG Electronics MSM7x27A M3EU.
+
+config MACH_MSM7X27A_M3MPCS
+    depends on ARCH_MSM7X27A
+    depends on !MSM_STACKED_MEMORY
+    select MACH_LGE
+    bool "MSM7x27A M3MPCS"
+    help
+        Support for the LG Electronics MSM7x27A M3MPCS.
+
+config MACH_MSM7X27A_HDK
+    depends on ARCH_MSM7X27A
+    depends on !MSM_STACKED_MEMORY
+    select MACH_LGE
+    bool "MSM7x27A HDK"
+    help
+        Support for the LG Electronics MSM7x27A HDK.
+
+endmenu
+
+menu "LGE Specific Patches"
+config LGE_H9DA4VH4JJMMCR_NAND_PATCH
+	bool "LGE Hynix H9DA4VH4JJMMCR nand probe patch"
+	help
+	  This patch is used for Hynix H9DAVH4JJMMCR nand probing.
+	  Because Read ID 4th(page & block size) are not match with QCT code,
+	  Put directly to parameter tables for device id 0xBC.
+
+config LGE_PROC_COMM
+	bool "LGE added proc comm"
+	depends on MACH_LGE
+	default n
+	help
+	  LGE added proc_comm
+
+config LGE_FBCON_INACTIVE_CONSOLE
+	bool "Support LGE FBCON inactive console"
+	default n
+	depends on MACH_LGE
+	help
+	 Choose if inactive console
+config LGE_SUPPORT_AT_CMD
+	bool "Support LGE AT_CMD system"
+	default n 
+	depends on MACH_LGE
+	help
+	 LGE AT_CMD Support
+
+config LGE_HANDLE_PANIC
+	tristate "Support LGE Kernel Panic Handler"
+	default n 
+	depends on MACH_LGE
+	depends on ANDROID_RAM_CONSOLE
+	help
+	 LGE crash handler
+
+config LGE_SILENCE_RESET
+	tristate "Support LGE Kernel Silence Reset"
+	default n 
+	depends on MACH_LGE
+	depends on ANDROID_RAM_CONSOLE
+	help
+	 LGE crash handler
+
+config LGE_GRAM_REFRESH_PATCH
+	bool "LGE gram refresh patch"
+	default n
+	help
+	  This patch is added for gram-embedded device like mddi.
+	  because, when suspend state, power of mddi is off usually,
+	  gram of DDI chip has garbage data until data of gram is refreshed.
+	  this can cause displaying broken screen in time of turning backlight on.
+	  for preventing this problem, add refreshing routine before turning 
+	  backlight on by using late resume mechanism.
+
+config MACH_MSM7X27A_M3MPCS_REV_A
+	bool "LGE MSM7x27A MPCS REV_A support"
+	default n
+	depends on MACH_LGE
+	depends on MACH_MSM7X27A_M3MPCS
+	help
+	  This patch is used for MSM7x27A MPCS REV_A support.
+	  Because MPCS REV_B has GPIO big changes.
+
+config LGE_HANDLE_PANIC
+	tristate "Support LGE Kernel Panic Handler"
+	default n 
+	depends on MACH_LGE
+	depends on ANDROID_RAM_CONSOLE
+	help
+	 LGE crash handler
+
+config LGE_BDI_TIMER_BUG_PATCH
+	bool "LGE bdi timer bug patch"
+	default n 
+	depends on MACH_LGE
+	help
+	  This patch is added for preventing from kernel panic which is
+	  generated during executing bdi_writeback_thread(). Root cause of
+	  this kernel panic starts from the synchronization problem between
+	  kernel threads. When mmc card is once removed, kernel try to 
+	  unregister data structures of bdi and delete bdi timer in kthread
+	  context. But, if bdi writeback kthread is already in execution,
+	  there is a probablity that that kthread trys to delete bdi timer
+	  which has been deleted already. In that case, 
+	  "del_timer(&wb->wakeup_timer)" code can generate kernel panic.
+	  So, I add the codes which checks whether bdi is unregitered or not 
+	  before removing timer.
+
+config LGE_REPORT_RMT_STORAGE_CLIENT_READY
+	bool "Report that RMT_STORAGE_CLIENT is ready to modem"
+	depends on MACH_LGE
+	default n
+	help
+	 Report that Remote storage client is ready to modem.
+	 After this signal modem can call efs_sync().
+
+config LGE_POWER_ON_STATUS_PATCH
+	bool "Report power on satus of handset"
+	depends on MACH_LGE
+	default n
+	help
+	 This patch is added to read the power on status from modem and update
+	 the same in apps processor's /proc/sys/kernel/boot_reason file.
+	 Ref: Documentation/arcr/arm/msm/boot.txt
+
+endmenu
+ 
+endmenu
